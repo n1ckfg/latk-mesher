@@ -13,6 +13,10 @@ sweep_sides = 4
 sweep_polygon_points = np.array([(sweep_radius * math.cos(i * math.pi / (sweep_sides/2)), sweep_radius * math.sin(i * math.pi / (sweep_sides/2))) for i in range(sweep_sides)])
 sweep_polygon = Polygon(sweep_polygon_points)
 
+contraction_val = 0.5
+smoothing_val = 0.5
+smoothing_iterations = 20
+
 for i, la_frame in enumerate(la_layer.frames):
 	mesh = trimesh.base.Trimesh()
 	
@@ -26,12 +30,13 @@ for i, la_frame in enumerate(la_layer.frames):
 		points = np.array(points)
 
 		stroke_mesh = trimesh.creation.sweep_polygon(sweep_polygon, path=points, cap_ends=True)
-		
+		trimesh.smoothing.filter_humphrey(stroke_mesh, alpha=contraction_val, beta=smoothing_val, iterations = smoothing_iterations)
+
 		vertices = np.concatenate((mesh.vertices, stroke_mesh.vertices))
 		faces = np.concatenate((mesh.faces, stroke_mesh.faces + len(mesh.vertices)))
 		mesh = trimesh.Trimesh(vertices, faces)
 
-	trimesh.smoothing.filter_humphrey(mesh, beta=0.7)
+	trimesh.smoothing.filter_humphrey(mesh, alpha=contraction_val, beta=smoothing_val, iterations = smoothing_iterations)
 	
 	mesh.export("output/test" + str(i) + ".ply")
 	print("Saved mesh " + str(i+1) + " of " + str(len(la_layer.frames)))
