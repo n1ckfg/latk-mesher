@@ -1,0 +1,5 @@
+*.latk
+*.obj
+*.ply
+.DS_Store
+

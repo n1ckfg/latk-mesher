@@ -1,3 +1,5 @@
 latk
 trimesh
 numpy
+shapely
+mapbox_earcut
