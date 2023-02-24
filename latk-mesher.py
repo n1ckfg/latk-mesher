@@ -2,12 +2,15 @@ import numpy as np
 import trimesh
 from shapely.geometry import Polygon
 import latk
+import math
 
 la = latk.Latk("test.latk")
 la_layer = la.layers[0]
+print("Loaded latk.")
 
-sweep_size=0.015
-sweep_polygon_points = np.array([[-sweep_size, -sweep_size], [sweep_size, -sweep_size], [sweep_size, sweep_size], [-sweep_size, sweep_size]])
+sweep_radius=0.02
+sweep_sides = 4
+sweep_polygon_points = np.array([(sweep_radius * math.cos(i * math.pi / (sweep_sides/2)), sweep_radius * math.sin(i * math.pi / (sweep_sides/2))) for i in range(sweep_sides)])
 sweep_polygon = Polygon(sweep_polygon_points)
 
 for i, la_frame in enumerate(la_layer.frames):
@@ -28,4 +31,7 @@ for i, la_frame in enumerate(la_layer.frames):
 		faces = np.concatenate((mesh.faces, stroke_mesh.faces + len(mesh.vertices)))
 		mesh = trimesh.Trimesh(vertices, faces)
 
-	mesh.export("test" + str(i) + ".ply")
+	trimesh.smoothing.filter_humphrey(mesh, beta=0.7)
+	
+	mesh.export("output/test" + str(i) + ".ply")
+	print("Saved mesh " + str(i+1) + " of " + str(len(la_layer.frames)))
