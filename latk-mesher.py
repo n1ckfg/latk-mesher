@@ -30,13 +30,19 @@ for i, la_frame in enumerate(la_layer.frames):
 		points = np.array(points)
 
 		stroke_mesh = trimesh.creation.sweep_polygon(sweep_polygon, path=points, cap_ends=True)
-		trimesh.smoothing.filter_humphrey(stroke_mesh, alpha=contraction_val, beta=smoothing_val, iterations = smoothing_iterations)
-
+		try:
+			trimesh.smoothing.filter_humphrey(stroke_mesh, alpha=contraction_val, beta=smoothing_val, iterations = smoothing_iterations)
+		except:
+			print("Stroke smooth pass failed.")
+			
 		vertices = np.concatenate((mesh.vertices, stroke_mesh.vertices))
 		faces = np.concatenate((mesh.faces, stroke_mesh.faces + len(mesh.vertices)))
 		mesh = trimesh.Trimesh(vertices, faces)
 
-	trimesh.smoothing.filter_humphrey(mesh, alpha=contraction_val, beta=smoothing_val, iterations = smoothing_iterations)
-	
+	try:
+		trimesh.smoothing.filter_humphrey(mesh, alpha=contraction_val, beta=smoothing_val, iterations = smoothing_iterations)
+	except:
+		print("Frame smooth pass failed.")
+		
 	mesh.export("output/test" + str(i) + ".ply")
 	print("Saved mesh " + str(i+1) + " of " + str(len(la_layer.frames)))
