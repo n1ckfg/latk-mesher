@@ -2,4 +2,8 @@
 *.obj
 *.ply
 .DS_Store
+output/*
+output2/*
+input/*
+input2/*
 
