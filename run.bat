@@ -1,5 +1,5 @@
 @echo off
 
-python latk-mesher.py -- "output.latk"
+python latk-mesher.py -- %1
 
 @pause
